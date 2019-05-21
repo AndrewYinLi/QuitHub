@@ -7,14 +7,15 @@ import (
 	"path/filepath"
 )
 
-// getSourcePath returns the path to where the src code for `QuitHub` is located
-func getSourcePath() string{
-	sourcePath := os.Getenv("GOPATH") // Init to GOPATH
+// getBackupPath gets path to store backups
+func getBackupPath(dirName string) string{
+	backupPath := os.Getenv("GOPATH") // Init to GOPATH
 	dirSlice := []string{"src", "github.com", "AndrewYinLi", "QuitHub"} // Path to QuitHub src code
 	for _,dir := range dirSlice{
-		sourcePath = path.Join(sourcePath, dir)
+		backupPath = path.Join(backupPath, dir)
 	}
-	return sourcePath
+	backupPath = path.Join(backupPath, dirName)
+	return backupPath
 }
 
 // Commit to the history for dirName a copy of the cwd renamed as commitName
@@ -24,7 +25,7 @@ func commit(dirName string, commitName string){
 
 // Revert the contents of the cwd to the contents of commitName stored in the history for dirName
 func revert(dirName string, commitName string){
-
+	
 }
 
 // Print the history of commits for dirName
@@ -38,23 +39,21 @@ func delete(dirName string, commitName string){
 }
 
 func main() {
+	// Get args
 	cd,_ := os.Getwd()
-	base := filepath.Base(cd)
+	baseName := filepath.Base(cd)
+	commitName := os.Args[1]
+	if len(os.Args) == 2{
+		commitName = os.Args[2]
+	}
+	// Determine action
 	if os.Args[1] == "commit"{
-		if len(os.Args) < 2{ // Error
-			// os.Args[2] is the new name
-		} else{
-
-		}
+		commit(baseName, commitName)
 	} else if os.Args[1] == "revert"{
-
+		revert(baseName, commitName)
 	} else if os.Args[1] == "history"{
-
+		history(baseName)
 	} else if os.Args[1] == "delete"{
-		if len(os.Args) < 2{ // Error, no name for deletion
-
-		} else{
-
-		}
+		delete(baseName, commitName)
 	}
 }
