@@ -1,12 +1,12 @@
 # Quithub
 ### Local version control for when you're too lazy to use GitHub 🤷‍♀️🤷‍♂️
-### Let's be real, how many commands do you know besides: 
-### 1. `add .`
-### 2. `commit -m "vague, unhelpful description here to piss off your team"`
-### 3. `push`?
-### Okay, maybe I just never learned how to properly use `git` from the command line 😭😝
+#### Let's be real, how many commands do you know besides: 
+#### 1. `add .`
+#### 2. `commit -m "vague, unhelpful description here to piss off your team"`
+#### 3. `push`?
+#### Okay, maybe I just never learned how to properly use `git` from the command line 😭😝
 
-*I was pretty close to naming this project 💩Hub.*
+*P.S. I was pretty close to naming this project 💩Hub.*
 
 ___
 
@@ -14,6 +14,8 @@ ___
 To start using `quithub`, install Go and run `go get`:
 
 `$ go get github.com/AndrewYinLi/QuitHub`
+
+___
 
 ### Usage
 **Begin by navigating to within the directory to backup:**
