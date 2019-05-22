@@ -16,8 +16,8 @@ func getAllBackupsPath() string{
 	for _,dir := range dirSlice{
 		backupHeadPath = path.Join(backupHeadPath, dir)
 	}
-	return "C:/Users/andre/Desktop/GoPath/backup" // for debugging
-	//return backupHeadPath
+	//return "C:/Users/andre/Desktop/GoPath/backup" // for debugging
+	return backupHeadPath
 }
 
 // Commit to the history for cd a copy of the cwd renamed as commitName
@@ -25,35 +25,51 @@ func commit(cd, commitName string){
 	// Get paths
 	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
 	backupCommitPath := path.Join(backupHeadPath, commitName)
-	// If backupCommitPath exists, delete it and its contents
-	delete(cd, commitName)
-	// Create backupCommitPath
-	err := os.MkdirAll(backupCommitPath, os.ModePerm)
+	deleteCommit(cd, commitName) // If backupCommitPath exists, delete it and its contents
+	copyToNewDir(backupCommitPath, cd, backupCommitPath) // Create backupCommitPath and copy all files from cd into backupCommitPath
+}
+
+// Creates empty directory at newPath and then copies contents of src to dest
+func copyToNewDir(newPath, src, dest string){
+	// Create newPath
+	err := os.MkdirAll(newPath, os.ModePerm)
 	if err != nil{
 		log.Fatal(err)
 	}
-	// Copy all files from cd into backupCommitPath
-	err = copy.Copy(cd, backupCommitPath)
+	// Copy all files from src to dest
+	err = copy.Copy(src, dest)
 	if err != nil{
 		log.Fatal(err)
 	}
 }
 
 // Revert the contents of the cwd to the contents of commitName stored in the history for cd
-func revert(cd, commitName string){
+func revertCommit(cd, commitName string){
+	// Get paths
+	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
+	backupCommitPath := path.Join(backupHeadPath, commitName)
+	// Check if backupCommitPath exists
+	_, err := os.Stat(backupCommitPath);
+	if os.IsNotExist(err) {
+		log.Fatal("Commit to revert to does not exist.")
+	}
+	// Delete contents of cd and copy all files from backupCommitPath to cd
+	deleteDir(cd)
+	copyToNewDir(cd, backupCommitPath, cd)
 
 }
 
 // Print the history of commits for cd (which is really just the contents of the dir lol)
-func history(cd string){
+func commitHistory(cd string){
 	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
+	// Open backupHeadPath
 	f, err := os.Open(backupHeadPath)
 	defer f.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Get and print file descriptions for all files in backupHeadPath
 	files, err := f.Readdir(-1)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,14 +79,19 @@ func history(cd string){
 }
 
 // Delete the directory commitName committed to cd
-func delete(cd, commitName string){
+func deleteCommit(cd, commitName string){
 	// Get paths
 	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
 	backupCommitPath := path.Join(backupHeadPath, commitName)
 	// If backupCommitPath exists, delete it and its contents
-	_, err := os.Stat(backupCommitPath);
+	deleteDir(backupCommitPath)
+}
+
+// Deletes directory and directory's contents
+func deleteDir(dirPath string){
+	_, err := os.Stat(dirPath);
 	if !os.IsNotExist(err) {
-		err := os.RemoveAll(backupCommitPath)
+		err := os.RemoveAll(dirPath)
 		if err != nil{
 			log.Fatal(err)
 		}
@@ -89,10 +110,10 @@ func main() {
 	if os.Args[1] == "commit"{
 		commit(cd, commitName)
 	} else if os.Args[1] == "revert"{
-		revert(cd, commitName)
+		revertCommit(cd, commitName)
 	} else if os.Args[1] == "history"{
-		history(cd)
+		commitHistory(cd)
 	} else if os.Args[1] == "delete"{
-		delete(cd, commitName)
+		deleteCommit(cd, commitName)
 	}
 }
