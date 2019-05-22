@@ -1,5 +1,5 @@
 # Quithub
-### Local version control for when you're too lazy to use GitHub 🤷‍♀️🤷‍♂️
+### Lightweight and simple local version control for when you're too lazy to use GitHub 🤷‍♀️🤷‍♂️
 #### Let's be real, how many commands do you know besides: 
 #### 1. `add .`
 #### 2. `commit -m "vague, unhelpful description here to piss off your team"`
