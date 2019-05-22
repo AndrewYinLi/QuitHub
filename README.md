@@ -2,7 +2,7 @@
 ### Local version control for when you're too lazy to use GitHub 🤷‍♀️🤷‍♂️
 ### Let's be real, how many commands do you know besides: 
 ### 1. `add .`
-### 2. `commit -m "vague, unhelpful description here"`
+### 2. `commit -m "vague, unhelpful description here to piss off your team"`
 ### 3. `push`?
 ### Okay, maybe I just never learned how to properly use `git` from the command line 😭😝
 
