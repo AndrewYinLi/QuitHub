@@ -101,7 +101,6 @@ func deleteCommit(cd, commitName string){
 func main() {
 	// Get args
 	cd,_ := os.Getwd()
-	//baseName := filepath.Base(cd)
 	commitName := filepath.Base(cd)
 	if len(os.Args) == 3{
 		commitName = os.Args[2]
@@ -115,5 +114,15 @@ func main() {
 		commitHistory(cd)
 	} else if os.Args[1] == "delete"{
 		deleteCommit(cd, commitName)
+	} else if os.Args[1] == "help"{
+		fmt.Println("")
+		fmt.Println("Begin by navigating to within the directory to backup:")
+		fmt.Println("`cd <directory path>`")
+		fmt.Println("")
+		fmt.Println("Commands:")
+		fmt.Println("   commit <name of commit>   Backs up current working directory under a new name")
+		fmt.Println("   revert <name of commit>   Revert current working directory to a past commit")
+		fmt.Println("   delete <name of commit>   Delete a commit from history")
+		fmt.Println("   history                   Print commit history")
 	}
 }
