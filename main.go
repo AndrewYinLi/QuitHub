@@ -10,32 +10,25 @@ import (
 )
 
 // getBackupPath gets path to store backups
-func getBackupHeadPath(cd string) string{
+func getAllBackupsPath() string{
 	backupHeadPath := os.Getenv("GOPATH") // Init to GOPATH
-	dirSlice := []string{"src", "github.com", "AndrewYinLi", "QuitHub"} // Path to QuitHub src code
+	dirSlice := []string{"src", "github.com", "AndrewYinLi", "QuitHub", "backup"} // Path to QuitHub src code
 	for _,dir := range dirSlice{
 		backupHeadPath = path.Join(backupHeadPath, dir)
 	}
-	backupHeadPath = path.Join(backupHeadPath, cd)
-	return "C:/Users/andre/Desktop/GoPath" // for debugging
+	return "C:/Users/andre/Desktop/GoPath/backup" // for debugging
 	//return backupHeadPath
 }
 
 // Commit to the history for cd a copy of the cwd renamed as commitName
 func commit(cd, commitName string){
 	// Get paths
-	backupHeadPath := getBackupHeadPath(filepath.Base(cd))
+	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
 	backupCommitPath := path.Join(backupHeadPath, commitName)
 	// If backupCommitPath exists, delete it and its contents
-	_, err := os.Stat(backupCommitPath);
-	if !os.IsNotExist(err) {
-		err := os.RemoveAll(backupCommitPath)
-		if err != nil{
-			log.Fatal(err)
-		}
-	}
+	delete(cd, commitName)
 	// Create backupCommitPath
-	err = os.MkdirAll(backupCommitPath, os.ModePerm)
+	err := os.MkdirAll(backupCommitPath, os.ModePerm)
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -53,12 +46,35 @@ func revert(cd, commitName string){
 
 // Print the history of commits for cd (which is really just the contents of the dir lol)
 func history(cd string){
+	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
+	f, err := os.Open(backupHeadPath)
+	defer f.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	files, err := f.Readdir(-1)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		fmt.Println(file.Name() + " " + file.ModTime().String())
+	}
 }
 
 // Delete the directory commitName committed to cd
 func delete(cd, commitName string){
-
+	// Get paths
+	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
+	backupCommitPath := path.Join(backupHeadPath, commitName)
+	// If backupCommitPath exists, delete it and its contents
+	_, err := os.Stat(backupCommitPath);
+	if !os.IsNotExist(err) {
+		err := os.RemoveAll(backupCommitPath)
+		if err != nil{
+			log.Fatal(err)
+		}
+	}
 }
 
 func main() {
