@@ -8,6 +8,8 @@
 
 *I was pretty close to naming this project 💩Hub.*
 
+___
+
 ### Installation
 To start using `quithub`, install Go and run `go get`:
 
