@@ -3,8 +3,8 @@
 #### Let's be real, how many commands do you know besides: 
 #### 1. `add .`
 #### 2. `commit -m "vague, unhelpful description here to piss off your team"`
-#### 3. `push`?
-#### Okay, maybe I just never learned how to properly use `git` from the command line 😭😝
+#### 3. `push`
+#### Okay, maybe it was just me who never learned how to properly use `git` from the command line 😭😝
 
 *P.S. I was pretty close to naming this project 💩Hub.*
 
