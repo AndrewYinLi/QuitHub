@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -16,29 +17,33 @@ func getBackupHeadPath(cd string) string{
 		backupHeadPath = path.Join(backupHeadPath, dir)
 	}
 	backupHeadPath = path.Join(backupHeadPath, cd)
-	return backupHeadPath
+	return "C:/Users/andre/Desktop/GoPath" // for debugging
+	//return backupHeadPath
 }
 
 // Commit to the history for cd a copy of the cwd renamed as commitName
 func commit(cd, commitName string){
 	// Get paths
-	cdBase := filepath.Base(cd)
-	backupHeadPath := getBackupHeadPath(cdBase)
+	backupHeadPath := getBackupHeadPath(filepath.Base(cd))
 	backupCommitPath := path.Join(backupHeadPath, commitName)
 	// If backupCommitPath exists, delete it and its contents
-	if _, err := os.Stat(backupCommitPath); os.IsExist(err) {
+	_, err := os.Stat(backupCommitPath);
+	if !os.IsNotExist(err) {
 		err := os.RemoveAll(backupCommitPath)
 		if err != nil{
 			log.Fatal(err)
 		}
 	}
-	_ = os.MkdirAll(backupCommitPath, os.ModePerm) // Create backupCommitPath
-	// Copy all files from cd into backupCommitPath
-	err := copy.Copy(cd, backupCommitPath)
+	// Create backupCommitPath
+	err = os.MkdirAll(backupCommitPath, os.ModePerm)
 	if err != nil{
 		log.Fatal(err)
 	}
-
+	// Copy all files from cd into backupCommitPath
+	err = copy.Copy(cd, backupCommitPath)
+	if err != nil{
+		log.Fatal(err)
+	}
 }
 
 // Revert the contents of the cwd to the contents of commitName stored in the history for cd
@@ -60,8 +65,8 @@ func main() {
 	// Get args
 	cd,_ := os.Getwd()
 	//baseName := filepath.Base(cd)
-	commitName := os.Args[1]
-	if len(os.Args) == 2{
+	commitName := filepath.Base(cd)
+	if len(os.Args) == 3{
 		commitName = os.Args[2]
 	}
 	// Determine action
