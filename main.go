@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -26,18 +27,13 @@ func commit(cd, commitName string){
 	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
 	backupCommitPath := path.Join(backupHeadPath, commitName)
 	deleteCommit(cd, commitName) // If backupCommitPath exists, delete it and its contents
-	copyToNewDir(backupCommitPath, cd, backupCommitPath) // Create backupCommitPath and copy all files from cd into backupCommitPath
-}
-
-// Creates empty directory at newPath and then copies contents of src to dest
-func copyToNewDir(newPath, src, dest string){
-	// Create newPath
-	err := os.MkdirAll(newPath, os.ModePerm)
+	// Create backupCommitPath
+	err := os.MkdirAll(backupCommitPath, os.ModePerm)
 	if err != nil{
 		log.Fatal(err)
 	}
-	// Copy all files from src to dest
-	err = copy.Copy(src, dest)
+	// copy all files from cd into backupCommitPath
+	err = copy.Copy(cd, backupCommitPath)
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -54,8 +50,17 @@ func revertCommit(cd, commitName string){
 		log.Fatal("Commit to revert to does not exist.")
 	}
 	// Delete contents of cd and copy all files from backupCommitPath to cd
-	deleteDir(cd)
-	copyToNewDir(cd, backupCommitPath, cd)
+	dir, err := ioutil.ReadDir(cd)
+	for _, file := range dir {
+		err = os.RemoveAll(path.Join([]string{"tmp", file.Name()}...))
+		if err != nil{
+			log.Fatal(err)
+		}
+	}
+	err = copy.Copy(backupCommitPath, cd)
+	if err != nil{
+		log.Fatal(err)
+	}
 
 }
 
@@ -84,14 +89,9 @@ func deleteCommit(cd, commitName string){
 	backupHeadPath := path.Join(getAllBackupsPath(), filepath.Base(cd))
 	backupCommitPath := path.Join(backupHeadPath, commitName)
 	// If backupCommitPath exists, delete it and its contents
-	deleteDir(backupCommitPath)
-}
-
-// Deletes directory and directory's contents
-func deleteDir(dirPath string){
-	_, err := os.Stat(dirPath);
+	_, err := os.Stat(backupCommitPath);
 	if !os.IsNotExist(err) {
-		err := os.RemoveAll(dirPath)
+		err := os.RemoveAll(backupCommitPath)
 		if err != nil{
 			log.Fatal(err)
 		}
